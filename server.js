@@ -4,11 +4,14 @@ const cors = require("cors");
 const morgan = require("morgan");
 const fs = require("fs");
 const path = require("path");
+var bodyParser = require('body-parser');
 const app = express();
+const data = require('./data');
+const { dirname } = require("path");
 
-const directory = "./src/images/";
+const directory = "./images/";
 
-app.use(express.static(path.join(__dirname, "client", "build")));
+// app.use(express.static(path.join(__dirname, "client", "build")));
 
 app.use(
   fileUpload({
@@ -17,6 +20,7 @@ app.use(
 );
 app.use(cors());
 app.use(express.json());
+app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
@@ -40,24 +44,23 @@ app.post("/picture", async (req, res) => {
         }
       });
 
-      picture.mv("./src/images/" + picture.name);
+      picture.mv("./images/" + picture.name);
 
       res.send({
         status: true,
         message: "File is uploaded",
       });
-      //   fs.renameSync('abc.jpg','./src/images/*', function(err) {
-      //     if ( err ) console.log('ERROR: ' + err);
-      // });
     }
   } catch (e) {
     res.status(500).send(e);
   }
 });
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "client", "build", "index.html"));
-});
+app.use('/get', data);
+
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+// });
 
 const port = process.env.PORT || 4000;
 
